@@ -33,13 +33,13 @@ def plot_metric_bar_multi(dfs, metric='mae', colors=None):
     combined = combined.sort_values('value', ascending=False)
 
     # Plot
-    plt.figure(figsize=(8,4))
+    plt.figure(figsize=(8,5))
     plt.bar(combined['model'], combined['value'],
             color=combined['color'])
     plt.title(f'{metric.upper()} Comparison Across Model Groups')
     plt.ylabel(metric.upper())
     plt.grid(axis='y', linestyle='--', alpha=0.5)
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=35)
 
     # Add labels
     for i, (_, row) in enumerate(combined.iterrows()):
@@ -53,12 +53,12 @@ def plot_metric_bar_multi(dfs, metric='mae', colors=None):
 def evaluate_cv(df, metric):
     models = df.columns.drop(['unique_id', 'ds', 'y', 'cutoff']).tolist()
     evals = metric(df, models=models)
-    evals['best_model'] = evals[models].idxmin(axis=1)
+    evals['best_statsforecast_model'] = evals[models].idxmin(axis=1)
     return evals
 
 def get_best_model_forecast(forecasts_df, evaluation_df):
-    with_best = forecasts_df.merge(evaluation_df[['unique_id', 'best_model']])
+    with_best = forecasts_df.merge(evaluation_df[['unique_id', 'best_statsforecast_model']])
     res = with_best[['unique_id', 'ds']].copy()
     for suffix in ('', '-lo-90', '-hi-90'):
-        res[f'best_model{suffix}'] = with_best.apply(lambda row: row[row['best_model'] + suffix], axis=1)
+        res[f'best_statsforecast_model{suffix}'] = with_best.apply(lambda row: row[row['best_statsforecast_model'] + suffix], axis=1)
     return res
